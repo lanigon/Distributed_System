@@ -141,7 +141,7 @@ class MyCmdApp(cmd.Cmd):
         """Monitor flight status: monitor <flight_id> <monitor_time>"""
         args = arg.split()
         if len(args) != 2:
-            print("Error: Please provide exactly one argument: <flight_id>. Usage: monitor <flight_id>")
+            print("Error: Please provide exactly one argument: <flight_id> <monitor_time>. Usage: monitor <flight_id> <monitor_time>")
         flight_id = args[0]
         time = args[1]
         
