@@ -1,6 +1,5 @@
 import cmd
 import socket
-import utils
 from flight import Flight
 from serialization import serialize_flight, deserialize_flights
 import struct
@@ -190,7 +189,7 @@ class MyCmdApp(cmd.Cmd):
         timestamp = current_time.timestamp()
         serialized_data = serialize_flight(flight, 5, timestamp, ip_address)
         retries = 0
-        while(retries < self.maxtimes)
+        while(retries < self.maxtimes):
           try:
               self.client_socket.sendto(serialized_data, (self.ipadd, self.port))
               data, server_address = self.client_socket.recvfrom(self.buffer_size)
@@ -218,7 +217,7 @@ class MyCmdApp(cmd.Cmd):
         current_time = datetime.now()
         timestamp = current_time.timestamp()
         retries = 0
-        while(retries < self.maxtimes)
+        while(retries < self.maxtimes):
           try:
               flight_id = int(flight_id)
               flight = Flight(
