@@ -1,2 +1,8 @@
 env/
-_pycache_/
+venv/
+
+__pycache__/
+*.py[cod]
+
+*.log
+*.tmp
