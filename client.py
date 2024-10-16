@@ -18,7 +18,7 @@ def test():
         seat_availability=15,
         duration= 0
     )
-    opcode = 3
+    opcode = 2
 
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
@@ -31,7 +31,9 @@ def test():
     data, server = client_socket.recvfrom(4096)
     print(f'Received: {data.decode()}')
     status, opcode, flights, message = deserialize_flights(data)
-
+    print(status)
+    print(opcode)
+    print(flights[0].airfare)
     print(message)
 
     client_socket.sendto(serialized_data, (ipadd, port))

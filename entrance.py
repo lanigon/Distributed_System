@@ -4,6 +4,7 @@ from flight import Flight
 from serialization import serialize_flight, deserialize_flights
 import struct
 from datetime import datetime
+import sys
 
 class MyCmdApp(cmd.Cmd):
     intro = 'Welcome to the DS Flight System. Type help or ? to list commands.\n'
@@ -204,7 +205,7 @@ class MyCmdApp(cmd.Cmd):
                   break
 
     def do_reserveSeat(self, arg):
-        """Reserve a seat on a flight: reserveSeat <flight_id>"""
+        """Reserve a seat on a flight: reserveSeat <flight_id> <seat_count>"""
         args = arg.split()
         if len(args) != 2:
             print("Error: Please provide exactly one arguments: <flight_id>. Usage: reserveSeat <flight_id> <seat_count>")
@@ -245,9 +246,53 @@ class MyCmdApp(cmd.Cmd):
                   print("Max retries reached. Request failed.")
                   break
 
+    def do_reserveByScores(self, arg):
+        """Reserve seats on a flight by scores: reserveByScores <flight_id> <seat_count>"""
+        args = arg.split()
+        if len(args) != 2:
+            print("Error: Please provide exactly one arguments: <flight_id>. Usage: reserveByScores <flight_id> <seat_count>")
+            return
 
+        flight_id = args[0]
+        count = args[1]
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+        current_time = datetime.now()
+        timestamp = current_time.timestamp()
+        retries = 0
+        while(retries < self.maxtimes):
+          try:
+              flight_id = int(flight_id)
+              flight = Flight(
+                  ID= flight_id,
+                  source="",
+                  destination="",
+                  departure_time="",
+                  seat_availability=count,
+                  duration= 0
+              )
+              serialized_data = serialize_flight(flight, 6, timestamp, ip_address)
+              self.client_socket.sendto(serialized_data, (self.ipadd, self.port))
+              data, server = self.client_socket.recvfrom(4096)
+              status, opcode, flights, message = deserialize_flights(data)
+              print(message)
+              seat_count = flights
+              break
+          except ValueError as e:
+              print(f"Error: {e}. Usage: reserveByScores <flight_id> ")
+          except socket.timeout:
+              retries += 1
+              print(f"Request timed out. Retrying {retries}/{max_retries}...")
+              if retries >= max_retries:
+                  print("Max retries reached. Request failed.")
+                  break
     def do_quit(self, arg):
-        """Exit the command line"""
+        print("Goodbye!")
+        sys.exit()
 
 if __name__ == '__main__':
-    MyCmdApp().cmdloop()
+    try:
+        MyCmdApp().cmdloop()  # 启动命令行循环
+    except KeyboardInterrupt:
+        print("\nCtrl+C pressed. Exiting...")
+        sys.exit(0)  # 正常退出程序
